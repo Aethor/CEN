@@ -5,10 +5,21 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-  "torch==1.6.0",
-  "torchvision==0.7.0",
-  "dgl-cu102==0.5.2",
+  "torch==2.1.0",
+  "torchvision==0.16.0",
+  "dgl>=2.1.0",
   "tqdm",
   "pandas",
   "rdflib",
 ]
+
+[tool.uv.sources]
+dgl = [
+  { index = "dgl-cu118" },
+]
+
+[[tool.uv.index]]
+name = "dgl-cu118"
+url = "https://data.dgl.ai/wheels/torch-2.1/cu118/repo.html"
+explict = true
+format = "flat"
