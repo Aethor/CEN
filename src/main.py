@@ -18,7 +18,7 @@ import copy
 import dgl
 import numpy as np
 import torch
-# from tqdm import tqdm
+from tqdm import tqdm
 import random
 sys.path.append("..")
 sys.path.append(".") #modified eval_paper_authors
@@ -602,7 +602,8 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
 
             idx = [_ for _ in range(len(train_list))]
             random.shuffle(idx)
-            for train_sample_num in idx:
+            for train_sample_num in tqdm(idx):
+                optimizer.zero_grad()
                 if train_sample_num == 0 or train_sample_num == 1: continue
                 if train_sample_num - args.start_history_len<0:
                     input_list = train_list[0: train_sample_num]
@@ -615,13 +616,16 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                 history_glist = [build_sub_graph(num_nodes, num_rels, snap, use_cuda, args.gpu) for snap in input_list]
                 output = [torch.from_numpy(_).long().cuda() for _ in output] if use_cuda else [torch.from_numpy(_).long() for _ in output]
 
-                loss= model.get_loss(history_glist, output[-1], None, use_cuda)
-                losses.append(loss.item())
-
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_norm)  # clip gradients
-                optimizer.step()
-                optimizer.zero_grad()
+                try:
+                    loss = model.get_loss(history_glist, output[-1], None, use_cuda)
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_norm)  # clip gradients
+                    optimizer.step()
+                    losses.append(loss.item())
+                except torch.OutOfMemoryError as e:
+                    print(e)
+                    torch.cuda.empty_cache()
+                    continue
 
             print("His {:04d}, Epoch {:04d} | Ave Loss: {:.4f} | Best MRR {:.4f} | Model {} "
                 .format(args.start_history_len, epoch, np.mean(losses), best_mrr, model_name))
