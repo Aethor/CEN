@@ -590,6 +590,7 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
         if not os.path.exists('../models/{}/'.format(args.dataset)):
             os.makedirs('../models/{}/'.format(args.dataset))
         model_state_file = '../models/{}/{}'.format(args.dataset, model_name) 
+        os.makedirs(model_state_file, exist_ok=True)
         print("Sanity Check: stat name : {}".format(model_state_file))
         print("Sanity Check: Is cuda available ? {}".format(torch.cuda.is_available()))
             
