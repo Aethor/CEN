@@ -773,6 +773,8 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                 eval_paper_authors_datasetname=args.dataset,  # this line was added by  eval_paper_authors for logging
                 eval_paper_authors_online_bool=False,
             )  # this line was added by  eval_paper_authors for logging)
+            return mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r
+
     elif args.test == 2:  # normal test on test set
         print("test args 2, " + test_state_file)
         if os.path.exists(test_state_file):
@@ -792,8 +794,10 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                 eval_paper_authors_datasetname=args.dataset,  # this line was added by  eval_paper_authors for logging
                 eval_paper_authors_online_bool=False,
             )  # this line was added by  eval_paper_authors for logging)
+            return mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r
         else:
             print("doesnt exist")
+
     elif args.test == 3:  # continual test the validataion set
         if os.path.exists(test_state_file):
             mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r = continual_test(
@@ -959,6 +963,7 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
             mode="test",
         )
         return mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r
+
     elif args.test == 0:
         # load best model with start history length
         init_state_file = "../models/{}/".format(
