@@ -168,7 +168,7 @@ def test(model, history_len, history_list, test_list, num_rels, num_nodes, use_c
         import pathlib
         dirname = os.path.join(pathlib.Path().resolve(), 'results' )
         eval_paper_authorsfilename = os.path.join(dirname, logname + ".pkl")
-        # if not os.path.isfile( eval_paper_authorsfilename):
+        os.makedirs(dirname, exist_ok=True)
         with open( eval_paper_authorsfilename,'wb') as file:
             pickle.dump( eval_paper_authors_logging_dict, file, protocol=4) 
         file.close()
@@ -430,7 +430,7 @@ def continual_test(model, test_history_len, history_list, data_list, num_rels, n
         import pathlib
         dirname = os.path.join(pathlib.Path().resolve(), 'results' )
         eval_paper_authorsfilename = os.path.join(dirname, logname + ".pkl")
-        # if not os.path.isfile( eval_paper_authorsfilename):
+        os.makedirs(dirname, exist_ok=True)
         with open( eval_paper_authorsfilename,'wb') as file:
             pickle.dump( eval_paper_authors_logging_dict, file, protocol=4) 
         file.close()
@@ -568,6 +568,8 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                                                 "valid",                                                
                                                 eval_paper_authors_datasetname=args.dataset, #this line was added by  eval_paper_authors for logging
                                                 eval_paper_authors_online_bool= True)  #this line was added by  eval_paper_authors for logging
+                return mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r
+
     elif args.test == 4:    # continual test the testing set
         if os.path.exists(test_state_file):
                 mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r = continual_test(model, 
@@ -583,6 +585,8 @@ def run_experiment(args, n_hidden=None, n_layers=None, dropout=None, n_bases=Non
                                                 "test",                                                
                                                 eval_paper_authors_datasetname=args.dataset, #this line was added by  eval_paper_authors for logging
                                                 eval_paper_authors_online_bool= True)  #this line was added by  eval_paper_authors for logging)
+                return mrr_raw, mrr_filter, mrr_raw_r, mrr_filter_r
+
     elif args.test == -1:
         print("----------------------------------------start pre training model with history length {}----------------------------------------\n".format(args.start_history_len))
         model_name = "{}-{}-ly{}-dilate{}-his{}-dp{}-gpu{}"\
@@ -961,7 +965,11 @@ if __name__ == '__main__':
                 o_f.write("Hits (raw) @ {}: {:.6f}\n".format(hit, avg_count.item()))
     # single run
     else:
-        run_experiment(args)
+        mmr_raw, mrr_filter, mrr_raw_r, mrr_filter_r = run_experiment(args)
+        print(f"{mmr_raw=}")
+        print(f"{mrr_filter=}")
+        print(f"{mrr_raw_r=}")
+        print(f"{mrr_filter_r=}")
     sys.exit()
 
 
