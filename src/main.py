@@ -1397,9 +1397,11 @@ if __name__ == "__main__":
                 o_f.write("Hits (raw) @ {}: {:.6f}\n".format(hit, avg_count.item()))
     # single run
     else:
-        mmr_raw, mrr_filter, mrr_raw_r, mrr_filter_r = run_experiment(args)
-        print(f"{mmr_raw=}")
-        print(f"{mrr_filter=}")
-        print(f"{mrr_raw_r=}")
-        print(f"{mrr_filter_r=}")
+        metrics = run_experiment(args)
+        if not metrics is None:
+            mmr_raw, mrr_filter, mrr_raw_r, mrr_filter_r = metrics
+            print(f"{mmr_raw=}")
+            print(f"{mrr_filter=}")
+            print(f"{mrr_raw_r=}")
+            print(f"{mrr_filter_r=}")
     sys.exit()
